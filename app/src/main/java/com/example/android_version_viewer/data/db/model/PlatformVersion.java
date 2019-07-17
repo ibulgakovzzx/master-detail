@@ -32,6 +32,19 @@ public class PlatformVersion implements Serializable {
         this.description = description;
     }
 
+    public void update(PlatformVersion other) {
+        if(other == null)
+            return;
+
+        version = other.version;
+        name = other.name;
+        released = other.released;
+        api = other.api;
+        distribution = other.distribution;
+        favourite = other.favourite;
+        description = other.description;
+    }
+
     public String getVersion() {
         return version;
     }

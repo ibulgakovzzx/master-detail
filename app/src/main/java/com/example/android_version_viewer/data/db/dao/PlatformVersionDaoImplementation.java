@@ -2,6 +2,7 @@ package com.example.android_version_viewer.data.db.dao;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 
@@ -31,20 +32,25 @@ public class PlatformVersionDaoImplementation implements PlatformVersionDao {
     }
 
     @Override
-    public void insert(List<PlatformVersion> dbStructures) {
-        for (PlatformVersion dbStructure : dbStructures) {
-            insert(dbStructure);
-        }
-    }
-
-    @Override
     public void delete(PlatformVersion dbStructure) {
         contentResolver.delete(uri, PlatformVersion.VERSION + " = ?", new String[] { dbStructure.getVersion() });
     }
 
     @Override
     public void update(PlatformVersion dbStructure) {
-        contentResolver.update(uri, converter.getContentValuesFromDbStructure(dbStructure), "version = ?", new String[] { dbStructure.getVersion() });
+        contentResolver.update(uri, converter.getContentValuesFromDbStructure(dbStructure), PlatformVersion.VERSION + " = ?", new String[] { dbStructure.getVersion() });
+    }
+
+    @Override
+    public PlatformVersion get(PlatformVersion dbStructure) {
+        PlatformVersion item = null;
+        Cursor cursor = contentResolver.query(uri, null, PlatformVersion.VERSION + " = ?", new String[] { dbStructure.getVersion() }, PlatformVersion.API + " DESC");
+        if(cursor != null && cursor.moveToFirst()) {
+            item = converter.getDbStructureFromCursor(cursor);
+            cursor.close();
+        }
+
+        return item;
     }
 
     @Override
@@ -64,5 +70,13 @@ public class PlatformVersionDaoImplementation implements PlatformVersionDao {
         return new ArrayList<>();
     }
 
+    @Override
+    public void listenChanges(ContentObserver observer) {
+        contentResolver.registerContentObserver(uri, false, observer);
+    }
 
+    @Override
+    public void stopListenChanges(ContentObserver observer) {
+        contentResolver.unregisterContentObserver(observer);
+    }
 }

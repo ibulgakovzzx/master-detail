@@ -24,9 +24,10 @@
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
             android:background="@null"
-            android:drawableEnd="@drawable/selector_favourite"
+            android:drawableEnd="@drawable/ic_unstar"
+            android:drawablePadding="4dp"
             android:padding="4dp"
-            android:text="Add to favorite" />
+            android:text="@string/toolbar_favorite_text" />
 
     </LinearLayout>
 

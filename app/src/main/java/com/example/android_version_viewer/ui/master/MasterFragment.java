@@ -3,8 +3,13 @@ package com.example.android_version_viewer.ui.master;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,12 +23,13 @@ import com.example.android_version_viewer.data.db.model.PlatformVersion;
 
 import java.util.List;
 
-public class MasterFragment extends Fragment implements MasterView, RecyclerClickListener {
+public class MasterFragment extends Fragment implements MasterView, RecyclerClickListener, View.OnClickListener {
 
     private static final String FOR_TABLETS_EXTRA = "for_tablets";
-    private static final String SELECTED_INDEX = "selected_item_index";
+    private static final String SELECTED_INDEX_EXTRA = "selected_item_index";
 
     private RecyclerView rvPlatformVersions;
+    private TextView tvListFilter;
     private PlatformVersionsAdapter listAdapter;
 
     private boolean forTablets;
@@ -52,9 +58,10 @@ public class MasterFragment extends Fragment implements MasterView, RecyclerClic
         super.onCreate(savedInstanceState);
         listAdapter = new PlatformVersionsAdapter(getLayoutInflater(), this);
         presenter = new MasterPresenterImplementation(getActivity().getSupportFragmentManager(), forTablets);
+        setHasOptionsMenu(true);
 
         if(savedInstanceState != null) {
-            listAdapter.setSelectedItemPosition(savedInstanceState.getInt(SELECTED_INDEX, -1));
+            listAdapter.setSelectedItemPosition(savedInstanceState.getInt(SELECTED_INDEX_EXTRA, -1));
         }
     }
 
@@ -64,6 +71,9 @@ public class MasterFragment extends Fragment implements MasterView, RecyclerClic
         View view = inflater.inflate(R.layout.fragment_master, container, false);
 
         rvPlatformVersions = view.findViewById(R.id.rv_platform_versions);
+        tvListFilter = view.findViewById(R.id.tv_list_filter);
+
+        tvListFilter.setOnClickListener(this);
 
         return view;
     }
@@ -79,18 +89,38 @@ public class MasterFragment extends Fragment implements MasterView, RecyclerClic
     }
 
     @Override
+    public void onClick(View view) {
+        if(view.getId() == R.id.tv_list_filter) {
+            PopupMenu popupMenu = new PopupMenu(getContext(), tvListFilter);
+            popupMenu.inflate(R.menu.master_menu);
+            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    switch (menuItem.getItemId()) {
+                        case R.id.menu_all:
+                            presenter.filterItems(ListFilterType.ALL);
+                            tvListFilter.setText(R.string.master_menu_all);
+                            return true;
+                        case R.id.menu_favorite:
+                            presenter.filterItems(ListFilterType.FAVORITE);
+                            tvListFilter.setText(R.string.master_menu_favorites);
+                            return true;
+                        case R.id.menu_distribution:
+                            presenter.filterItems(ListFilterType.DISTRIBUTION);
+                            tvListFilter.setText(R.string.master_menu_distribution);
+                            return true;
+                    }
+                    return false;
+                }
+            });
+
+            popupMenu.show();
+        }
+    }
+
+    @Override
     public void showList(List<PlatformVersion> list) {
         listAdapter.setItems(list);
-    }
-
-    @Override
-    public void updateListItem(PlatformVersion item) {
-        listAdapter.updateItem(item);
-    }
-
-    @Override
-    public void deleteItem(PlatformVersion item) {
-        listAdapter.removeItem(item);
     }
 
     @Override
@@ -104,16 +134,20 @@ public class MasterFragment extends Fragment implements MasterView, RecyclerClic
     }
 
     @Override
-    public void onItemClick(int position) {
+    public void onItemClick(View view, int position) {
         PlatformVersion item = listAdapter.getItem(position);
-        if(forTablets) {
-            listAdapter.setSelectedItem(item);
+        if(view.getId() == R.id.btn_favourite) {
+            presenter.setStartStatus(item);
+        } else {
+            if(forTablets) {
+                listAdapter.setSelectedItem(item);
+            }
+            presenter.goToDetailScreen(item);
         }
-        presenter.goToDetailScreen(item);
     }
 
     @Override
-    public void onItemLongClick(int position) {
+    public void onItemLongClick(View view, int position) {
         showDeleteAlertDialog(listAdapter.getItem(position));
     }
 
@@ -141,6 +175,6 @@ public class MasterFragment extends Fragment implements MasterView, RecyclerClic
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(SELECTED_INDEX, listAdapter.getSelectedItemPosition());
+        outState.putInt(SELECTED_INDEX_EXTRA, listAdapter.getSelectedItemPosition());
     }
 }

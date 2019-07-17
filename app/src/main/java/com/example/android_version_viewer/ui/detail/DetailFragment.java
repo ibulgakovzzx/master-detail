@@ -47,7 +47,7 @@ public class DetailFragment extends Fragment implements DetailView, View.OnClick
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        presenter = new DetailPresenterImplementation();
+        presenter = new DetailPresenterImplementation(platformVersion);
     }
 
     @Nullable
@@ -67,7 +67,7 @@ public class DetailFragment extends Fragment implements DetailView, View.OnClick
 
         btnAddToFavourite.setOnClickListener(this);
 
-        presenter.onAttach(this, platformVersion);
+        presenter.onAttach(this);
     }
 
     @Override
@@ -90,7 +90,11 @@ public class DetailFragment extends Fragment implements DetailView, View.OnClick
 
     @Override
     public void setFavoriteStatus(boolean isFavourite) {
-        btnAddToFavourite.setSelected(isFavourite);
+            btnAddToFavourite.setCompoundDrawablesWithIntrinsicBounds(
+                    0,
+                    0,
+                    isFavourite ? R.drawable.ic_star : R.drawable.ic_unstar,
+                    0);
     }
 }
 

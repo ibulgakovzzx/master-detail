@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">android-version-viewer</string>
+    <string name="app_name">Master detail</string>
+    <string name="master_menu_distribution"><![CDATA[< 3% distribution]]></string>
+    <string name="master_menu_favorites">Favorites</string>
+    <string name="master_menu_all">All</string>
+    <string name="toolbar_favorite_text">Add to favorite</string>
 </resources>

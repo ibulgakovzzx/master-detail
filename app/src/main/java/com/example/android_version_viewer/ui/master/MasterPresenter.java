@@ -10,4 +10,6 @@ public interface MasterPresenter {
 
     void setStartStatus(PlatformVersion item);
     void deleteItem(PlatformVersion item);
+
+    void filterItems(ListFilterType filterType);
 }

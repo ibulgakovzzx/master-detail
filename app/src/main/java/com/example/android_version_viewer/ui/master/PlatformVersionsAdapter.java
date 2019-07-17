@@ -58,21 +58,6 @@ public class PlatformVersionsAdapter extends RecyclerView.Adapter<PlatformVersio
         notifyDataSetChanged();
     }
 
-    void updateItem(PlatformVersion item) {
-        int index = items.indexOf(item);
-        if(index != -1) {
-            notifyItemChanged(index);
-        }
-    }
-
-    void removeItem(PlatformVersion item) {
-        int index = items.indexOf(item);
-        if(index != -1) {
-            items.remove(index);
-            notifyItemRemoved(index);
-        }
-    }
-
     void setSelectedItem(PlatformVersion item) {
         int index = items.indexOf(item);
         if(index != -1) {
@@ -112,6 +97,8 @@ public class PlatformVersionsAdapter extends RecyclerView.Adapter<PlatformVersio
             tvName = itemView.findViewById(R.id.tv_name);
             btnFavourite = itemView.findViewById(R.id.btn_favourite);
 
+            btnFavourite.setOnClickListener(this);
+
             this.recyclerClickListener = recyclerClickListener;
         }
 
@@ -127,7 +114,7 @@ public class PlatformVersionsAdapter extends RecyclerView.Adapter<PlatformVersio
             int position = getAdapterPosition();
             if(position != RecyclerView.NO_POSITION) {
                 if(recyclerClickListener != null) {
-                    recyclerClickListener.onItemClick(position);
+                    recyclerClickListener.onItemClick(view, position);
                 }
             }
         }
@@ -137,7 +124,7 @@ public class PlatformVersionsAdapter extends RecyclerView.Adapter<PlatformVersio
             int position = getAdapterPosition();
             if(position != RecyclerView.NO_POSITION) {
                 if(recyclerClickListener != null) {
-                    recyclerClickListener.onItemLongClick(position);
+                    recyclerClickListener.onItemLongClick(view, position);
                     return true;
                 }
             }

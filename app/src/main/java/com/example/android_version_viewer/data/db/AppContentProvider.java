@@ -54,9 +54,6 @@ public class AppContentProvider extends ContentProvider {
     public Cursor query(@NonNull Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
         SQLiteDatabase database = dbHelper.getReadableDatabase();
-
-        notifyUriChange(uri);
-
         return database.query(getTableName(uri), projection, selection, selectionArgs, null, null, sortOrder);
     }
 
